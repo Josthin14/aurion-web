@@ -221,7 +221,7 @@ export default function AurionHomepage({ logoSrc }) {
           <div className="hidden items-center gap-8 text-xs font-black uppercase tracking-[0.28em] text-white/45 md:flex">
             <a href="#vision" className="transition hover:text-white">Vision</a>
             <a href="#ecosystem" className="transition hover:text-white">Ecosystem</a>
-            <a href="#horizon" className="transition hover:text-white">Horizon</a>
+            <a href="/horizon" className="transition hover:text-white">Horizon</a>
             <a href="#leadership" className="transition hover:text-white">Leadership</a>
           </div>
           <button className="rounded-full border border-white/20 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] transition hover:bg-white hover:text-black">Access</button>
@@ -316,7 +316,7 @@ export default function AurionHomepage({ logoSrc }) {
               <h2 className="text-5xl font-black leading-[0.88] tracking-[-0.075em] md:text-6xl">The mythology engine.</h2>
               <p className="mt-7 max-w-[18rem] leading-8 text-white/55">Anime, music, games and cinematic events connected by the symbol of infinity.</p>
               <div className="mt-7 h-px w-28 bg-gradient-to-r from-[#7A3FFF] to-transparent" />
-              <a href="#horizon" className="mt-6 inline-flex items-center gap-3 rounded-full border border-[#7A3FFF]/60 bg-[#7A3FFF]/10 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-[#7A3FFF]/20">Explore Horizon <Icon name="arrow" size={14} /></a>
+              <a href="/horizon" className="mt-6 inline-flex items-center gap-3 rounded-full border border-[#7A3FFF]/60 bg-[#7A3FFF]/10 px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition hover:bg-[#7A3FFF]/20">Explore Horizon <Icon name="arrow" size={14} /></a>
             </div>
 
             <div className="relative min-w-0">
