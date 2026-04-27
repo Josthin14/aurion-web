@@ -1,16 +1,15 @@
 import React from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import Tilt from "react-parallax-tilt";
 
 const iconPaths = {
   arrow: "M5 12h14M13 5l7 7-7 7",
-  building: "M4 21V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v15M4 21h16M8 8h2M8 12h2M8 16h2M14 8h2M14 12h2M14 16h2",
   music: "M9 18V5l11-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm11-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z",
   film: "M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5Zm4-2v18M16 3v18M4 8h4M4 16h4M16 8h4M16 16h4",
   shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z",
   cpu: "M8 8h8v8H8V8Zm-4 4h4M16 12h4M12 4v4M12 16v4M6 4v3M18 4v3M6 17v3M18 17v3M4 6h3M17 6h3M4 18h3M17 18h3",
   scale: "M12 3v18M5 6h14M6 6l-3 7h6L6 6Zm12 0l-3 7h6l-3-7ZM9 21h6",
   globe: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-20c3 3 4 6 4 10s-1 7-4 10c-3-3-4-6-4-10s1-7 4-10ZM2 12h20",
-  sparkles: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM5 16l.8 2.2L8 19l-2.2.8L5 22l-.8-2.2L2 19l2.2-.8L5 16ZM19 15l.7 1.8 1.8.7-1.8.7L19 20l-.7-1.8-1.8-.7 1.8-.7L19 15Z",
   lock: "M7 11V8a5 5 0 0 1 10 0v3M6 11h12v10H6V11Z",
 };
 
@@ -46,7 +45,6 @@ function runSmokeTests() {
   console.assert(leaders.length === 6, "AURION homepage should render 6 leadership entries.");
   console.assert(horizonItems.length === 4, "AURION homepage should render 4 Horizon cards before the coming-soon card.");
   console.assert(horizonLogoSrc.endsWith(".png"), "Horizon main logo should use a PNG asset path.");
-  console.assert(Object.keys(iconPaths).length >= 10, "Local icon library should include all required icons.");
 
   divisions.forEach((division) => {
     console.assert(Boolean(iconPaths[division.icon]), `${division.name} needs a valid local icon.`);
@@ -60,10 +58,21 @@ function runSmokeTests() {
   });
 }
 
-function Icon({ name, size = 22, className = "", strokeWidth = 2 }) {
+function Icon({ name, size = 22, className = "" }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d={iconPaths[name] || iconPaths.sparkles} />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d={iconPaths[name] || iconPaths.globe} />
     </svg>
   );
 }
@@ -76,8 +85,8 @@ function AurionLogo({ small = false, logoSrc, alt = "AURION Global Holdings", da
   return (
     <div className="flex items-end gap-1 select-none" aria-label="AURION logo">
       <span className={`${small ? "text-2xl" : "text-7xl md:text-9xl"} font-black tracking-[-0.08em] leading-none ${dark ? "text-white" : "text-neutral-900"}`}>AURI</span>
-      <span className={`${small ? "text-2xl" : "text-7xl md:text-9xl"} font-black leading-none relative inline-flex items-center justify-center w-[0.9em] h-[0.9em] rounded-full border-[0.12em] ${dark ? "border-white" : "border-neutral-900"}`}>
-        <span className="absolute w-[1.15em] h-[0.11em] bg-[#C9CCD1]" />
+      <span className={`${small ? "text-2xl" : "text-7xl md:text-9xl"} relative inline-flex h-[0.9em] w-[0.9em] items-center justify-center rounded-full border-[0.12em] ${dark ? "border-white" : "border-neutral-900"}`}>
+        <span className="absolute h-[0.11em] w-[1.15em] bg-[#C9CCD1]" />
       </span>
       <span className={`${small ? "text-2xl" : "text-7xl md:text-9xl"} font-black tracking-[-0.08em] leading-none ${dark ? "text-white" : "text-neutral-900"}`}>N</span>
     </div>
@@ -85,12 +94,12 @@ function AurionLogo({ small = false, logoSrc, alt = "AURION Global Holdings", da
 }
 
 function Pill({ children }) {
-  return <span className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-[10px] font-black tracking-[0.25em] uppercase text-white/70 backdrop-blur-xl">{children}</span>;
+  return <span className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-[10px] font-black uppercase tracking-[0.25em] text-white/70 backdrop-blur-xl">{children}</span>;
 }
 
 function AuroraBackground() {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <motion.div animate={{ x: [0, 80, -40, 0], y: [0, -30, 50, 0], scale: [1, 1.1, 0.96, 1] }} transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} className="absolute left-[-12%] top-[10%] h-[38rem] w-[38rem] rounded-full bg-[#7A3FFF]/25 blur-3xl" />
       <motion.div animate={{ x: [0, -70, 40, 0], y: [0, 50, -40, 0], scale: [1, 0.95, 1.12, 1] }} transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }} className="absolute right-[-10%] top-[20%] h-[34rem] w-[34rem] rounded-full bg-[#D4AF37]/20 blur-3xl" />
       <motion.div animate={{ opacity: [0.18, 0.34, 0.18] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.18),transparent_35%)]" />
@@ -102,7 +111,16 @@ function HorizonCard({ item, index, active, onActivate, cardRef }) {
   const isActive = active === index;
 
   return (
-    <motion.button
+    <Tilt
+      tiltMaxAngleX={isActive ? 4 : 3}
+      tiltMaxAngleY={isActive ? 4 : 3}
+      perspective={1400}
+      transitionSpeed={1500}
+      scale={1.01}
+      glareEnable={false}
+      className="shrink-0 snap-center rounded-[1.4rem]"
+    >
+      <motion.button
       ref={cardRef}
       type="button"
       initial={{ opacity: 0, y: 28 }}
@@ -115,7 +133,7 @@ function HorizonCard({ item, index, active, onActivate, cardRef }) {
       style={{ boxShadow: isActive ? `0 0 72px ${item.glow}` : "0 22px 45px rgba(0,0,0,0.35)" }}
     >
       <div className="relative aspect-[2/3] overflow-hidden bg-black">
-        <img src={item.image} alt={item.name} className={`absolute inset-0 h-full w-full object-contain bg-black transition duration-700 ${isActive ? "brightness-110 contrast-105" : "brightness-75 contrast-95 group-hover/card:brightness-100"}`} />
+        <img src={item.image} alt={item.name} className={`absolute inset-0 h-full w-full bg-black object-contain transition duration-700 ${isActive ? "brightness-110 contrast-105" : "brightness-75 contrast-95 group-hover/card:brightness-100"}`} />
         <div className={`absolute inset-0 bg-gradient-to-t transition duration-500 ${isActive ? "from-black/82 via-black/16 to-black/0" : "from-black/92 via-black/35 to-black/10"}`} />
         <div className={`absolute inset-0 transition duration-500 ${isActive ? "opacity-100" : "opacity-0"}`} style={{ background: `radial-gradient(circle at 50% 35%, transparent 34%, ${item.glow} 145%)` }} />
 
@@ -133,7 +151,8 @@ function HorizonCard({ item, index, active, onActivate, cardRef }) {
           </div>
         </div>
       </div>
-    </motion.button>
+      </motion.button>
+    </Tilt>
   );
 }
 
@@ -141,7 +160,16 @@ function MoreHorizonsCard({ active, onActivate, cardRef }) {
   const isActive = active === horizonItems.length;
 
   return (
-    <motion.button
+    <Tilt
+      tiltMaxAngleX={isActive ? 4 : 3}
+      tiltMaxAngleY={isActive ? 4 : 3}
+      perspective={1400}
+      transitionSpeed={1500}
+      scale={1.01}
+      glareEnable={false}
+      className="shrink-0 snap-center rounded-[1.4rem]"
+    >
+      <motion.button
       ref={cardRef}
       type="button"
       initial={{ opacity: 0, y: 28 }}
@@ -163,7 +191,8 @@ function MoreHorizonsCard({ active, onActivate, cardRef }) {
           <p className="mt-5 text-[10px] font-black uppercase tracking-[0.28em] text-[#7A3FFF]">The journey never ends.</p>
         </div>
       </div>
-    </motion.button>
+      </motion.button>
+    </Tilt>
   );
 }
 
@@ -174,6 +203,7 @@ console.assert(typeof MoreHorizonsCard === "function", "MoreHorizonsCard should 
 console.assert(typeof React.useState === "function", "React state should be available for active Horizon focus.");
 console.assert(typeof React.useEffect === "function", "React effect should be available for auto carousel behavior.");
 console.assert(typeof React.useRef === "function", "React ref should be available for carousel centering.");
+console.assert(typeof React.useCallback === "function", "React callback should be available for carousel pause/resume.");
 
 export default function AurionHomepage({ logoSrc }) {
   const [activeHorizon, setActiveHorizon] = React.useState(0);
@@ -185,18 +215,18 @@ export default function AurionHomepage({ logoSrc }) {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0.35]);
   const gridY = useTransform(scrollYProgress, [0, 1], [0, -220]);
 
+  const stopCarousel = React.useCallback(() => {
+    if (!intervalRef.current) return;
+    window.clearInterval(intervalRef.current);
+    intervalRef.current = null;
+  }, []);
+
   const startCarousel = React.useCallback(() => {
     if (intervalRef.current) return;
     const totalCards = horizonItems.length + 1;
     intervalRef.current = window.setInterval(() => {
       setActiveHorizon((current) => (current + 1) % totalCards);
     }, 5000);
-  }, []);
-
-  const stopCarousel = React.useCallback(() => {
-    if (!intervalRef.current) return;
-    window.clearInterval(intervalRef.current);
-    intervalRef.current = null;
   }, []);
 
   React.useEffect(() => {
@@ -213,7 +243,7 @@ export default function AurionHomepage({ logoSrc }) {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#070707] text-white selection:bg-[#7A3FFF] selection:text-white">
-      <motion.div className="fixed inset-0 pointer-events-none opacity-[0.08]" style={{ y: gridY, backgroundImage: "linear-gradient(#FFFFFF 1px, transparent 1px), linear-gradient(90deg, #FFFFFF 1px, transparent 1px)", backgroundSize: "72px 72px" }} />
+      <motion.div className="pointer-events-none fixed inset-0 opacity-[0.08]" style={{ y: gridY, backgroundImage: "linear-gradient(#FFFFFF 1px, transparent 1px), linear-gradient(90deg, #FFFFFF 1px, transparent 1px)", backgroundSize: "72px 72px" }} />
 
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/45 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
@@ -221,7 +251,7 @@ export default function AurionHomepage({ logoSrc }) {
           <div className="hidden items-center gap-8 text-xs font-black uppercase tracking-[0.28em] text-white/45 md:flex">
             <a href="#vision" className="transition hover:text-white">Vision</a>
             <a href="#ecosystem" className="transition hover:text-white">Ecosystem</a>
-            <a href="/horizon" className="transition hover:text-white">Horizon</a>
+            <a href="#horizon" className="transition hover:text-white">Horizon</a>
             <a href="#leadership" className="transition hover:text-white">Leadership</a>
           </div>
           <button className="rounded-full border border-white/20 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] transition hover:bg-white hover:text-black">Access</button>
@@ -275,7 +305,7 @@ export default function AurionHomepage({ logoSrc }) {
       </section>
 
       <section id="ecosystem" className="relative bg-[#F7F7F5] py-28 text-[#2B2B2B] md:py-40">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.06]" style={{ backgroundImage: "linear-gradient(#2B2B2B 1px, transparent 1px), linear-gradient(90deg, #2B2B2B 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "linear-gradient(#2B2B2B 1px, transparent 1px), linear-gradient(90deg, #2B2B2B 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
         <div className="relative mx-auto max-w-7xl px-6">
           <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
@@ -286,7 +316,17 @@ export default function AurionHomepage({ logoSrc }) {
           </div>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {divisions.map((item, i) => (
-              <motion.div key={item.name} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ delay: i * 0.05, duration: 0.65 }} className="group relative overflow-hidden rounded-[1.7rem] border border-black/10 bg-white/80 p-7 shadow-sm backdrop-blur-sm transition hover:shadow-2xl">
+              <Tilt
+                key={item.name}
+                tiltMaxAngleX={6}
+                tiltMaxAngleY={6}
+                perspective={1200}
+                transitionSpeed={1400}
+                scale={1.01}
+                glareEnable={false}
+                className="rounded-[1.7rem]"
+              >
+                <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ delay: i * 0.05, duration: 0.65 }} className="group relative overflow-hidden rounded-[1.7rem] border border-black/10 bg-white/80 p-7 shadow-sm backdrop-blur-sm transition hover:shadow-2xl">
                 <div className="absolute inset-x-0 top-0 h-1 opacity-80" style={{ backgroundColor: item.accent }} />
                 <div className="mb-12 flex items-center justify-between">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-lg" style={{ backgroundColor: item.accent }}>
@@ -297,7 +337,8 @@ export default function AurionHomepage({ logoSrc }) {
                 <h3 className="text-2xl font-black tracking-[-0.04em]">{item.name}</h3>
                 <p className="mt-4 leading-7 text-neutral-600">{item.desc}</p>
                 <div className="mt-8 flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] opacity-0 transition group-hover:opacity-100">Open Division <Icon name="arrow" size={15} /></div>
-              </motion.div>
+                </motion.div>
+              </Tilt>
             ))}
           </div>
         </div>
@@ -305,7 +346,7 @@ export default function AurionHomepage({ logoSrc }) {
 
       <section id="horizon" className="relative overflow-hidden bg-[#050505] py-24 text-white md:py-32">
         <AuroraBackground />
-        <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{ backgroundImage: "linear-gradient(#FFFFFF 1px, transparent 1px), linear-gradient(90deg, #FFFFFF 1px, transparent 1px)", backgroundSize: "72px 72px" }} />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(#FFFFFF 1px, transparent 1px), linear-gradient(90deg, #FFFFFF 1px, transparent 1px)", backgroundSize: "72px 72px" }} />
         <img src={horizonLogoSrc} alt="Horizon by AURION" className="pointer-events-none absolute right-[-10%] top-10 hidden w-[42rem] select-none opacity-[0.025] grayscale lg:block xl:w-[52rem]" />
 
         <div className="relative mx-auto max-w-[92rem] px-6">
@@ -324,7 +365,7 @@ export default function AurionHomepage({ logoSrc }) {
                 ref={carouselRef}
                 onMouseEnter={stopCarousel}
                 onMouseLeave={startCarousel}
-                className="flex min-w-full snap-x snap-mandatory items-center gap-5 overflow-x-auto px-6 pb-10 pt-8 pr-[34rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="flex min-w-full snap-x snap-mandatory items-center gap-5 overflow-x-auto px-6 pb-10 pt-8 pr-34 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
                 {horizonItems.map((item, index) => (
                   <HorizonCard

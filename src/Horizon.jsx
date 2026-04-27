@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import Lenis from "lenis";
+import Tilt from "react-parallax-tilt";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 
 const INTRO_DURATION_FALLBACK = 10000;
 const horizonLogoSrc = "/images/horizon-infinity-logo.png";
@@ -20,8 +17,6 @@ const horizonLogos = [
     image: "/images/horizon-logo-penumbra.png",
     accent: "#F5B942",
     glow: "rgba(245,185,66,0.45)",
-    x: "22%",
-    y: "24%",
   },
   {
     id: "h2",
@@ -31,8 +26,6 @@ const horizonLogos = [
     image: "/images/horizon-logo-iros.png",
     accent: "#8B5CF6",
     glow: "rgba(139,92,246,0.45)",
-    x: "78%",
-    y: "28%",
   },
   {
     id: "h3",
@@ -42,8 +35,6 @@ const horizonLogos = [
     image: "/images/horizon-logo-xibalba.png",
     accent: "#F59E0B",
     glow: "rgba(245,158,11,0.45)",
-    x: "74%",
-    y: "74%",
   },
   {
     id: "h4",
@@ -53,8 +44,6 @@ const horizonLogos = [
     image: "/images/horizon-logo-wildvein.png",
     accent: "#22C55E",
     glow: "rgba(34,197,94,0.45)",
-    x: "26%",
-    y: "74%",
   },
 ];
 
@@ -65,7 +54,7 @@ const horizons = [
     image: "/images/horizon1.png",
     accent: "#D4AF37",
     glow: "rgba(212,175,55,0.35)",
-    copy: "La primera herida del sistema: fe, sacrificio, oscuridad y una luz que se niega a morir.",
+    copy: "Faith, sacrifice and the first fracture of the system.",
   },
   {
     name: "IRØS",
@@ -73,7 +62,7 @@ const horizons = [
     image: "/images/horizon2.png",
     accent: "#7A3FFF",
     glow: "rgba(122,63,255,0.42)",
-    copy: "La música como señal. Tres idols, una identidad global y fragmentos de poder ocultos bajo el escenario.",
+    copy: "Music becomes signal, identity and hidden power.",
   },
   {
     name: "XIBALBÁ",
@@ -81,7 +70,7 @@ const horizons = [
     image: "/images/horizon3.png",
     accent: "#F59E0B",
     glow: "rgba(245,158,11,0.42)",
-    copy: "Un mundo ancestral donde los dioses caen, el sol se corrompe y el infinito toca la tierra.",
+    copy: "Ancient gods fall as corruption reaches the sky.",
   },
   {
     name: "WILDVEIN",
@@ -89,30 +78,30 @@ const horizons = [
     image: "/images/horizon4.png",
     accent: "#22C55E",
     glow: "rgba(34,197,94,0.38)",
-    copy: "Un bosque vivo, criaturas guerreras y archivos prohibidos de un pasado que nadie debe recordar.",
+    copy: "A living archive where forbidden memory still breathes.",
   },
 ];
 
 const timeline = [
   {
-    title: "The First Light",
+    title: "The First Fracture",
     tag: "01",
-    copy: "Horizon inicia con una tragedia íntima: Kael, Eira y el nacimiento de una grieta que conecta mundos.",
+    copy: "What begins as personal tragedy becomes the first visible wound in the mythological system of Horizon.",
   },
   {
-    title: "The Signal",
+    title: "The Signal Awakens",
     tag: "02",
-    copy: "IRØS convierte el sistema en sonido: pop, guerra emocional y poder escondido tras una marca musical.",
+    copy: "With IRØS, the universe expands beyond fantasy into music, identity and emotional warfare hidden in plain sight.",
   },
   {
-    title: "The Ancient Fall",
+    title: "The Ancient Corruption",
     tag: "03",
-    copy: "XIBALBÁ revela que la corrupción no pertenece a un solo mundo. Es cósmica. Es antigua. Es Horizon.",
+    copy: "XIBALBÁ reveals that the anomaly is older than any one world and far more dangerous than it first appeared.",
   },
   {
     title: "The Living Archive",
     tag: "04",
-    copy: "WILDVEIN guarda rastros del pasado perdido y abre la puerta a una verdad mucho más grande.",
+    copy: "WILDVEIN preserves fragments of a forbidden past, pulling the entire mythology toward convergence.",
   },
 ];
 
@@ -130,6 +119,24 @@ function ArrowIcon({ className = "" }) {
     >
       <path d="M5 12h14M13 5l7 7-7 7" />
     </svg>
+  );
+}
+
+function PremiumButton({ href, children, variant = "primary" }) {
+  const primary = variant === "primary";
+
+  return (
+    <a
+      href={href}
+      className={`group relative inline-flex items-center gap-3 overflow-hidden rounded-full px-7 py-4 text-xs font-black uppercase tracking-[0.16em] transition duration-300 ${
+        primary
+          ? "bg-white text-black hover:bg-[#DADDE3]"
+          : "border border-white/20 text-white hover:bg-white/10"
+      }`}
+    >
+      <span className="relative z-10 inline-flex items-center gap-3">{children}</span>
+      <span className="pointer-events-none absolute inset-0 -translate-x-[130%] bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.0)_30%,rgba(255,255,255,0.35)_50%,rgba(255,255,255,0.0)_70%,transparent_100%)] transition duration-700 group-hover:translate-x-[130%]" />
+    </a>
   );
 }
 
@@ -152,7 +159,7 @@ function HeroBackground() {
         playsInline
       />
 
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.78)_0%,rgba(2,6,23,0.52)_28%,rgba(2,6,23,0.18)_58%,rgba(2,6,23,0.22)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.80)_0%,rgba(2,6,23,0.54)_28%,rgba(2,6,23,0.18)_58%,rgba(2,6,23,0.24)_100%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_68%_48%,rgba(120,84,255,0.16),transparent_18%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_44%,rgba(99,102,241,0.22),transparent_26%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_65%,rgba(59,130,246,0.12),transparent_22%)]" />
@@ -207,34 +214,10 @@ function HeroConstellation() {
     horizonLogos.find((item) => item.id === activeNode) || horizonLogos[1];
 
   const nodes = [
-    {
-      ...horizonLogos[0],
-      left: "31%",
-      top: "29%",
-      size: 132,
-      delay: 0,
-    },
-    {
-      ...horizonLogos[1],
-      left: "76%",
-      top: "28%",
-      size: 144,
-      delay: 0.15,
-    },
-    {
-      ...horizonLogos[2],
-      left: "74%",
-      top: "72%",
-      size: 136,
-      delay: 0.3,
-    },
-    {
-      ...horizonLogos[3],
-      left: "34%",
-      top: "74%",
-      size: 136,
-      delay: 0.45,
-    },
+    { ...horizonLogos[0], left: "31%", top: "29%", size: 132, delay: 0 },
+    { ...horizonLogos[1], left: "76%", top: "28%", size: 144, delay: 0.15 },
+    { ...horizonLogos[2], left: "74%", top: "72%", size: 136, delay: 0.3 },
+    { ...horizonLogos[3], left: "34%", top: "74%", size: 136, delay: 0.45 },
   ];
 
   const stars = Array.from({ length: 42 }, (_, i) => ({
@@ -245,6 +228,49 @@ function HeroConstellation() {
     duration: 3 + (i % 4),
     delay: (i % 6) * 0.35,
   }));
+
+  const particleKeyframes = [
+    { left: "18%", top: "50%" },
+    { left: "28%", top: "34%" },
+    { left: "39%", top: "34%" },
+    { left: "50%", top: "50%" },
+    { left: "61%", top: "66%" },
+    { left: "72%", top: "66%" },
+    { left: "82%", top: "50%" },
+    { left: "72%", top: "34%" },
+    { left: "61%", top: "34%" },
+    { left: "50%", top: "50%" },
+    { left: "39%", top: "66%" },
+    { left: "28%", top: "66%" },
+    { left: "18%", top: "50%" },
+  ];
+
+  const particles = [
+    {
+      id: "p1",
+      size: 10,
+      color: "#ffffff",
+      glow: "0 0 18px rgba(255,255,255,0.95)",
+      duration: 6,
+      delay: 0,
+    },
+    {
+      id: "p2",
+      size: 12,
+      color: activeItem.accent,
+      glow: `0 0 22px ${activeItem.glow}`,
+      duration: 8.5,
+      delay: -2,
+    },
+    {
+      id: "p3",
+      size: 9,
+      color: "#60a5fa",
+      glow: "0 0 20px rgba(96,165,250,0.95)",
+      duration: 7.2,
+      delay: -4,
+    },
+  ];
 
   return (
     <motion.div
@@ -293,22 +319,56 @@ function HeroConstellation() {
 
         <motion.div
           animate={{
-            scale: [1, 1.08, 1],
-            opacity: [0.35, 0.7, 0.35],
+            scale: [1, 1.1, 1],
+            opacity: [0.45, 0.88, 0.45],
           }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[11rem] w-[11rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.95)_0%,rgba(167,139,250,0.42)_24%,rgba(96,165,250,0.22)_44%,transparent_72%)] blur-xl"
+          transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[12rem] w-[12rem] -translate-x-1/2 -translate-y-1/2 rounded-full blur-xl"
+          style={{
+            background: `radial-gradient(circle,
+              rgba(255,255,255,0.92) 0%,
+              ${activeItem.accent}66 22%,
+              ${activeItem.accent}33 42%,
+              transparent 72%)`,
+            boxShadow: `0 0 60px ${activeItem.glow}`,
+          }}
         />
 
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
           className="pointer-events-none absolute left-1/2 top-1/2 h-[13rem] w-[13rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10"
+          style={{ boxShadow: `0 0 20px ${activeItem.glow}` }}
         />
+
         <motion.div
-          animate={{ rotate: -360 }}
-          transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[18rem] w-[18rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#8B5CF6]/15"
+          animate={{
+            rotate: -360,
+            borderColor: [
+              `${activeItem.accent}33`,
+              `${activeItem.accent}88`,
+              `${activeItem.accent}33`,
+            ],
+          }}
+          transition={{
+            rotate: { duration: 22, repeat: Infinity, ease: "linear" },
+            borderColor: { duration: 2.5, repeat: Infinity, ease: "easeInOut" },
+          }}
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[18rem] w-[18rem] -translate-x-1/2 -translate-y-1/2 rounded-full border"
+        />
+
+        <motion.div
+          animate={{ scale: [0.95, 1.45], opacity: [0.28, 0] }}
+          transition={{ duration: 3.8, repeat: Infinity, ease: "easeOut" }}
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[7rem] w-[7rem] -translate-x-1/2 -translate-y-1/2 rounded-full border"
+          style={{ borderColor: `${activeItem.accent}88` }}
+        />
+
+        <motion.div
+          animate={{ scale: [1, 1.75], opacity: [0.2, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeOut", delay: 1.1 }}
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[7rem] w-[7rem] -translate-x-1/2 -translate-y-1/2 rounded-full border"
+          style={{ borderColor: `${activeItem.accent}55` }}
         />
 
         <svg
@@ -335,11 +395,7 @@ function HeroConstellation() {
           </defs>
 
           <motion.path
-            d="M 180 350
-               C 255 235, 355 235, 500 350
-               C 645 465, 745 465, 820 350
-               C 745 235, 645 235, 500 350
-               C 355 465, 255 465, 180 350"
+            d="M 180 350 C 255 235, 355 235, 500 350 C 645 465, 745 465, 820 350 C 745 235, 645 235, 500 350 C 355 465, 255 465, 180 350"
             fill="none"
             stroke="url(#infinityStrokeClean)"
             strokeWidth="14"
@@ -352,22 +408,70 @@ function HeroConstellation() {
           />
 
           <motion.path
-            d="M 180 350
-               C 255 235, 355 235, 500 350
-               C 645 465, 745 465, 820 350
-               C 745 235, 645 235, 500 350
-               C 355 465, 255 465, 180 350"
+            d="M 180 350 C 255 235, 355 235, 500 350 C 645 465, 745 465, 820 350 C 745 235, 645 235, 500 350 C 355 465, 255 465, 180 350"
             fill="none"
-            stroke="url(#infinityStrokeClean)"
-            strokeWidth="2.2"
+            stroke={activeItem.accent}
+            strokeWidth="2.4"
             strokeLinecap="round"
             strokeDasharray="7 10"
-            opacity="0.58"
+            opacity="0.38"
             initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.8, ease: "easeInOut" }}
+            animate={{ pathLength: 1, opacity: [0.26, 0.6, 0.26] }}
+            transition={{
+              pathLength: { duration: 1.8, ease: "easeInOut" },
+              opacity: { duration: 2.4, repeat: Infinity, ease: "easeInOut" },
+            }}
           />
         </svg>
+
+        {particles.map((particle) => (
+          <React.Fragment key={particle.id}>
+            <motion.div
+              className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                width: particle.size,
+                height: particle.size,
+                background: particle.color,
+                boxShadow: particle.glow,
+              }}
+              animate={{
+                left: particleKeyframes.map((p) => p.left),
+                top: particleKeyframes.map((p) => p.top),
+                opacity: [0, 1, 1, 1, 1, 1, 0.8, 1, 1, 1, 1, 1, 0],
+                scale: [0.8, 1.1, 1, 1, 1, 1, 0.95, 1, 1, 1, 1, 1, 0.8],
+              }}
+              transition={{
+                duration: particle.duration,
+                delay: particle.delay,
+                repeat: Infinity,
+                ease: "linear",
+                times: Array.from({ length: particleKeyframes.length }, (_, i) => i / (particleKeyframes.length - 1)),
+              }}
+            />
+            <motion.div
+              className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-md"
+              style={{
+                width: particle.size * 2.2,
+                height: particle.size * 2.2,
+                background: particle.color,
+                opacity: 0.22,
+              }}
+              animate={{
+                left: particleKeyframes.map((p) => p.left),
+                top: particleKeyframes.map((p) => p.top),
+                opacity: [0, 0.18, 0.22, 0.22, 0.2, 0.18, 0.15, 0.2, 0.22, 0.22, 0.18, 0.15, 0],
+                scale: [0.9, 1.3, 1.15, 1.1, 1.1, 1.05, 1, 1.08, 1.15, 1.1, 1.05, 1, 0.9],
+              }}
+              transition={{
+                duration: particle.duration,
+                delay: particle.delay,
+                repeat: Infinity,
+                ease: "linear",
+                times: Array.from({ length: particleKeyframes.length }, (_, i) => i / (particleKeyframes.length - 1)),
+              }}
+            />
+          </React.Fragment>
+        ))}
       </div>
 
       {nodes.map((item, index) => (
@@ -382,11 +486,7 @@ function HeroConstellation() {
           transition={{
             opacity: { duration: 0.55, delay: item.delay },
             scale: { duration: 0.55, delay: item.delay },
-            y: {
-              duration: 5 + index,
-              repeat: Infinity,
-              ease: "easeInOut",
-            },
+            y: { duration: 5 + index, repeat: Infinity, ease: "easeInOut" },
           }}
           className="absolute -translate-x-1/2 -translate-y-1/2"
           style={{ left: item.left, top: item.top }}
@@ -397,10 +497,7 @@ function HeroConstellation() {
             onMouseEnter={() => setActiveNode(item.id)}
             onFocus={() => setActiveNode(item.id)}
             className="group relative"
-            style={{
-              width: `${item.size}px`,
-              height: `${item.size}px`,
-            }}
+            style={{ width: `${item.size}px`, height: `${item.size}px` }}
           >
             <motion.div
               animate={{
@@ -418,11 +515,7 @@ function HeroConstellation() {
 
             <motion.div
               animate={{ rotate: 360 }}
-              transition={{
-                duration: 18 + index * 2,
-                repeat: Infinity,
-                ease: "linear",
-              }}
+              transition={{ duration: 18 + index * 2, repeat: Infinity, ease: "linear" }}
               className="absolute inset-0 rounded-full border border-white/10"
             />
 
@@ -476,11 +569,7 @@ function HeroConstellation() {
 
             <motion.div
               animate={{ rotate: -360 }}
-              transition={{
-                duration: 12 + index * 2,
-                repeat: Infinity,
-                ease: "linear",
-              }}
+              transition={{ duration: 12 + index * 2, repeat: Infinity, ease: "linear" }}
               className="absolute inset-0"
             >
               <div
@@ -503,9 +592,7 @@ function HeroConstellation() {
           exit={{ opacity: 0, y: 12 }}
           transition={{ duration: 0.22 }}
           className="absolute bottom-8 right-8 z-20 w-[20rem] rounded-[1.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(5,9,18,0.88),rgba(4,7,16,0.76))] p-5 backdrop-blur-xl"
-          style={{
-            boxShadow: `0 0 22px ${activeItem.glow}`,
-          }}
+          style={{ boxShadow: `0 0 22px ${activeItem.glow}` }}
         >
           <p
             className="text-[10px] font-black uppercase tracking-[0.28em]"
@@ -514,9 +601,7 @@ function HeroConstellation() {
             {activeItem.short}
           </p>
 
-          <h4 className="mt-2 text-2xl font-black text-white">
-            {activeItem.name}
-          </h4>
+          <h4 className="mt-2 text-2xl font-black text-white">{activeItem.name}</h4>
 
           <p className="mt-2 text-sm leading-relaxed text-white/65">
             {activeItem.subtitle}
@@ -525,44 +610,71 @@ function HeroConstellation() {
       </AnimatePresence>
     </motion.div>
   );
-}function HorizonPoster({ item, index }) {
+}
+
+function HorizonPoster({ item, index }) {
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 34 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ delay: index * 0.08, duration: 0.7 }}
-      className="group relative overflow-hidden rounded-[1.7rem] border border-white/12 bg-black shadow-2xl transition duration-500 hover:-translate-y-2 hover:border-white/35"
-      onMouseEnter={(event) => {
-        event.currentTarget.style.boxShadow = `0 0 80px ${item.glow}`;
-      }}
-      onMouseLeave={(event) => {
-        event.currentTarget.style.boxShadow = "0 24px 55px rgba(0,0,0,0.45)";
-      }}
+    <Tilt
+      tiltMaxAngleX={5}
+      tiltMaxAngleY={5}
+      perspective={1400}
+      transitionSpeed={1400}
+      scale={1.01}
+      glareEnable={false}
+      className="rounded-[1.7rem]"
     >
-      <div className="relative aspect-[2/3] bg-black">
-        <img
-          src={item.image}
-          alt={item.name}
-          className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105 group-hover:brightness-110"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/32 to-transparent" />
-        <div className="absolute inset-x-0 top-0 flex items-center gap-3 p-6">
-          <span className="h-9 w-1 rounded-full" style={{ backgroundColor: item.accent }} />
-          <p className="text-[10px] font-black uppercase tracking-[0.38em] text-white/72">{item.code}</p>
+      <motion.article
+        initial={{ opacity: 0, y: 34 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ delay: index * 0.08, duration: 0.7 }}
+        className="group relative overflow-hidden rounded-[1.7rem] border border-white/12 bg-black shadow-2xl transition duration-500 hover:-translate-y-2 hover:border-white/35"
+        onMouseEnter={(event) => {
+          event.currentTarget.style.boxShadow = `0 0 80px ${item.glow}`;
+        }}
+        onMouseLeave={(event) => {
+          event.currentTarget.style.boxShadow = "0 24px 55px rgba(0,0,0,0.45)";
+        }}
+      >
+        <div className="relative aspect-[2/3] bg-black">
+          <img
+            src={item.image}
+            alt={item.name}
+            className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105 group-hover:brightness-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/32 to-transparent" />
+          <div className="absolute inset-x-0 top-0 flex items-center gap-3 p-6">
+            <span className="h-9 w-1 rounded-full" style={{ backgroundColor: item.accent }} />
+            <p className="text-[10px] font-black uppercase tracking-[0.38em] text-white/72">
+              {item.code}
+            </p>
+          </div>
+          <div className="absolute inset-x-0 bottom-0 p-6">
+            <h3 className="text-3xl font-black leading-none tracking-[-0.06em]">
+              {item.name}
+            </h3>
+            <p className="mt-4 text-sm leading-6 text-white/65">{item.copy}</p>
+
+            <div className="mt-6">
+              <a
+                href="#final"
+                className="group/btn relative inline-flex items-center gap-3 overflow-hidden rounded-full px-5 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-white transition"
+                style={{
+                  backgroundColor: `${item.accent}55`,
+                  border: `1px solid ${item.accent}`,
+                }}
+              >
+                <span className="relative z-10 inline-flex items-center gap-3">
+                  Enter Horizon
+                  <ArrowIcon className="h-4 w-4 transition group-hover/btn:translate-x-1" />
+                </span>
+                <span className="pointer-events-none absolute inset-0 -translate-x-[130%] bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.0)_30%,rgba(255,255,255,0.35)_50%,rgba(255,255,255,0.0)_70%,transparent_100%)] transition duration-700 group-hover/btn:translate-x-[130%]" />
+              </a>
+            </div>
+          </div>
         </div>
-        <div className="absolute inset-x-0 bottom-0 p-6">
-          <h3 className="text-3xl font-black leading-none tracking-[-0.06em]">{item.name}</h3>
-          <p className="mt-4 text-sm leading-6 text-white/65">{item.copy}</p>
-          <button
-            className="mt-6 inline-flex items-center gap-3 rounded-full px-5 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-white transition hover:scale-105"
-            style={{ backgroundColor: `${item.accent}55`, border: `1px solid ${item.accent}` }}
-          >
-            Enter Horizon <ArrowIcon className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-    </motion.article>
+      </motion.article>
+    </Tilt>
   );
 }
 
@@ -573,11 +685,13 @@ function TimelineCard({ item, index }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ delay: index * 0.07, duration: 0.65 }}
-      className="rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-7 backdrop-blur-xl"
+      className="rounded-[1.6rem] border border-white/10 bg-white/[0.05] p-7 backdrop-blur-xl"
     >
-      <span className="text-5xl font-black tracking-[-0.08em] text-white/10">{item.tag}</span>
+      <span className="text-5xl font-black tracking-[-0.08em] text-white/10">
+        {item.tag}
+      </span>
       <h3 className="mt-8 text-2xl font-black tracking-[-0.04em]">{item.title}</h3>
-      <p className="mt-4 leading-7 text-white/55">{item.copy}</p>
+      <p className="mt-4 leading-7 text-white/58">{item.copy}</p>
     </motion.div>
   );
 }
@@ -588,6 +702,29 @@ export default function Horizon() {
   const { scrollYProgress } = useScroll();
   const heroScale = useTransform(scrollYProgress, [0, 0.28], [1, 0.96]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0.5]);
+
+  React.useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.1,
+      smoothWheel: true,
+      smoothTouch: false,
+      touchMultiplier: 1.2,
+    });
+
+    let rafId;
+
+    function raf(time) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
 
   React.useEffect(() => {
     const fallback = window.setTimeout(() => {
@@ -640,7 +777,11 @@ export default function Horizon() {
                   ← AURION
                 </a>
 
-                <img src={horizonLogoSrc} alt="Horizon by AURION" className="h-9 object-contain" />
+                <img
+                  src={horizonLogoSrc}
+                  alt="Horizon by AURION"
+                  className="h-9 object-contain"
+                />
 
                 <a
                   href="#worlds"
@@ -701,20 +842,14 @@ export default function Horizon() {
                     transition={{ duration: 0.9, delay: 0.44 }}
                     className="mt-12 flex flex-wrap gap-4"
                   >
-                    <a
-                      href="#worlds"
-                      className="group inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-xs font-black uppercase tracking-[0.16em] text-black transition hover:bg-[#C9CCD1]"
-                    >
+                    <PremiumButton href="#worlds" variant="primary">
                       Explore Worlds
                       <ArrowIcon className="h-4 w-4 transition group-hover:translate-x-1" />
-                    </a>
+                    </PremiumButton>
 
-                    <a
-                      href="#system"
-                      className="rounded-full border border-white/20 px-7 py-4 text-xs font-black uppercase tracking-[0.16em] transition hover:bg-white/10"
-                    >
+                    <PremiumButton href="#system" variant="secondary">
                       Read System
-                    </a>
+                    </PremiumButton>
                   </motion.div>
                 </div>
 
@@ -723,69 +858,175 @@ export default function Horizon() {
             </section>
 
             <section id="system" className="relative border-y border-white/10 py-32 md:py-44">
-  <SectionAtmosphere />
-  <div className="relative mx-auto max-w-7xl px-6">
-    <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-120px" }}
-        transition={{ duration: 0.75 }}
-      >
-        <p className="text-xs font-black uppercase tracking-[0.42em] text-[#9B6DFF]">
-          What is Horizon
-        </p>
+              <SectionAtmosphere />
+              <div className="relative mx-auto max-w-7xl px-6">
+                <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-120px" }}
+                    transition={{ duration: 0.75 }}
+                  >
+                    <p className="text-xs font-black uppercase tracking-[0.42em] text-[#9B6DFF]">
+                      What is Horizon
+                    </p>
 
-        <h2 className="mt-5 text-5xl font-black leading-[0.9] tracking-[-0.07em] md:text-7xl">
-          AURION’s mythological entertainment universe.
-        </h2>
-      </motion.div>
+                    <h2 className="mt-5 text-5xl font-black leading-[0.9] tracking-[-0.07em] md:text-7xl">
+                      AURION’s mythological entertainment universe.
+                    </h2>
+                  </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-120px" }}
-        transition={{ duration: 0.75, delay: 0.12 }}
-        className="rounded-[2rem] border border-white/10 bg-white/[0.06] p-8 backdrop-blur-2xl md:p-10"
-      >
-        <p className="text-xl leading-9 text-white/65">
-          Horizon is a connected narrative IP where anime, music, videogames and
-          cinematic worlds exist under one evolving mythology. Each Horizon may
-          appear independent at first, but all of them are bound by the infinity
-          symbol, hidden anomalies and a final convergence still waiting to unfold.
-        </p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-120px" }}
+                    transition={{ duration: 0.75, delay: 0.12 }}
+                    className="rounded-[2rem] border border-white/10 bg-white/[0.06] p-8 backdrop-blur-2xl md:p-10"
+                  >
+                    <p className="text-xl leading-9 text-white/65">
+                      Horizon is a connected narrative IP where anime, music,
+                      videogames and cinematic worlds exist under one evolving
+                      mythology. Each Horizon may appear independent at first,
+                      but all of them are bound by the infinity symbol, hidden
+                      anomalies and a final convergence still waiting to unfold.
+                    </p>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {[
-            "Connected IP",
-            "Multiple Media Forms",
-            "One Expanding Mythology",
-          ].map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-white/10 bg-black/30 p-6 text-center font-black uppercase tracking-[0.18em] text-white/72"
-            >
-              {item}
-            </div>
-          ))}
-        </div>
-      </motion.div>
-    </div>
-  </div>
-</section>
+                    <div className="mt-8 grid gap-4 md:grid-cols-3">
+                      {[
+                        "Connected IP",
+                        "Multiple Media Forms",
+                        "One Expanding Mythology",
+                      ].map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-2xl border border-white/10 bg-black/30 p-6 text-center font-black uppercase tracking-[0.18em] text-white/72"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </section>
+
+            <section id="worlds" className="relative bg-[#050505] py-32 md:py-44">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(122,63,255,0.08),transparent_35%)]" />
+              <div className="relative mx-auto max-w-7xl px-6">
+                <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.42em] text-[#9B6DFF]">
+                      Current Worlds
+                    </p>
+                    <h2 className="mt-5 text-5xl font-black leading-none tracking-[-0.07em] md:text-7xl">
+                      Enter the Horizons.
+                    </h2>
+                  </div>
+                  <p className="max-w-md leading-8 text-white/55">
+                    Every world expands the same hidden system. Some are fantasy.
+                    Some are music. Some are games. All are connected.
+                  </p>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+                  {horizons.map((item, index) => (
+                    <HorizonPoster key={item.name} item={item} index={index} />
+                  ))}
+                </div>
+              </div>
+            </section>
 
             <section id="timeline" className="relative border-y border-white/10 py-32 md:py-44">
               <SectionAtmosphere />
               <div className="relative mx-auto max-w-7xl px-6">
-                <p className="text-xs font-black uppercase tracking-[0.42em] text-white/40">Narrative Timeline</p>
-                <h2 className="mt-5 max-w-4xl text-5xl font-black leading-none tracking-[-0.07em] md:text-7xl">
-                  The order of awakening.
-                </h2>
+                <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.42em] text-white/40">
+                      Narrative Timeline
+                    </p>
+                    <h2 className="mt-5 max-w-4xl text-5xl font-black leading-none tracking-[-0.07em] md:text-7xl">
+                      The order of awakening.
+                    </h2>
+                  </div>
+                  <p className="max-w-md leading-8 text-white/55">
+                    Each Horizon unlocks a larger truth, pushing the mythology
+                    toward a convergence no world can escape.
+                  </p>
+                </div>
 
-                <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                   {timeline.map((item, index) => (
                     <TimelineCard key={item.title} item={item} index={index} />
                   ))}
+                </div>
+              </div>
+            </section>
+
+            <section id="vision" className="relative bg-[#040404] py-32 md:py-44">
+              <SectionAtmosphere />
+              <div className="relative mx-auto max-w-7xl px-6">
+                <div className="overflow-hidden rounded-[2.2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(10,14,28,0.92),rgba(6,8,18,0.86))] p-8 shadow-[0_0_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl md:p-12">
+                  <div className="grid items-center gap-12 lg:grid-cols-[1fr_0.95fr]">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.42em] text-[#9B6DFF]">
+                        AURION ∞ VISION
+                      </p>
+
+                      <h2 className="mt-5 text-5xl font-black leading-[0.9] tracking-[-0.07em] md:text-7xl">
+                        The cinematic format reserved for Horizon.
+                      </h2>
+
+                      <p className="mt-6 max-w-2xl text-lg leading-9 text-white/60">
+                        AURION ∞ VISION is the premium cinematic standard built
+                        for Horizon’s biggest experiences — immersive image,
+                        expansive sound, pulse-driven seating and a theatrical
+                        scale designed for myth, war and convergence.
+                      </p>
+
+                      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                        {["∞ Canvas", "∞ Sonic Core", "Pulse Seats"].map((item) => (
+                          <div
+                            key={item}
+                            className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center text-xs font-black uppercase tracking-[0.22em] text-white/72"
+                          >
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="relative min-h-[22rem] overflow-hidden rounded-[2rem] border border-white/10 bg-black/40">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.26)_0%,rgba(59,130,246,0.16)_28%,transparent_70%)]" />
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_32%,rgba(255,255,255,0.03)_70%,transparent_100%)]" />
+
+                      <motion.div
+                        animate={{
+                          scale: [1, 1.06, 1],
+                          opacity: [0.5, 0.9, 0.5],
+                        }}
+                        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.95)_0%,rgba(167,139,250,0.40)_22%,rgba(96,165,250,0.20)_45%,transparent_72%)] blur-lg"
+                      />
+
+                      <div className="absolute inset-x-10 top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+                        className="absolute left-1/2 top-1/2 h-[15rem] w-[15rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10"
+                      />
+
+                      <motion.div
+                        animate={{ rotate: -360 }}
+                        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+                        className="absolute left-1/2 top-1/2 h-[10rem] w-[10rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#8B5CF6]/35"
+                      />
+
+                      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full border border-white/10 bg-black/45 px-5 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-white/70 backdrop-blur-md">
+                        Premium Horizon Experience
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
@@ -804,11 +1045,19 @@ export default function Horizon() {
                 </h2>
 
                 <p className="mx-auto mt-8 max-w-3xl text-lg leading-9 text-white/58">
-                  Battleworld, Kang, AURIONA and the true purpose of Horizon remain classified within the core mythology. More worlds are coming. More scars will open. The journey never ends.
+                  Battleworld, Kang, AURIONA and the true purpose of Horizon remain
+                  classified within the core mythology. More worlds are coming.
+                  More scars will open. The journey never ends.
                 </p>
 
-                <div className="mt-10 inline-flex rounded-full border border-white/15 bg-white/8 px-6 py-3 text-xs font-black uppercase tracking-[0.24em] text-white/65 backdrop-blur-xl">
-                  More Horizons are coming
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                  <PremiumButton href="#vision" variant="secondary">
+                    Discover ∞ Vision
+                  </PremiumButton>
+
+                  <PremiumButton href="#worlds" variant="primary">
+                    Re-enter the Worlds
+                  </PremiumButton>
                 </div>
               </div>
             </section>
