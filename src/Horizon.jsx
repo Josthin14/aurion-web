@@ -1,12 +1,16 @@
 import React, { useMemo, useRef, useState } from "react";
 import Lenis from "lenis";
 import Tilt from "react-parallax-tilt";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   AnimatePresence,
   motion,
   useScroll,
   useTransform,
 } from "framer-motion";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const INTRO_DURATION_FALLBACK = 10000;
 const horizonLogoSrc = "/images/horizon-infinity-logo.png";
@@ -16,7 +20,7 @@ const horizonHeroVideo = "/videos/horizon-hero.mp4";
 const conceptSlides = [
   {
     eyebrow: "Different Worlds",
-    title: "Every story takes place in its own universe.",
+    title: "Every story happens in its own universe.",
     copy: "Each Horizon is built as a distinct world with its own rules, tone, characters and mythology.",
     accent: "#8B5CF6",
     glow: "rgba(139,92,246,0.38)",
@@ -33,7 +37,7 @@ const conceptSlides = [
   {
     eyebrow: "One Identity",
     title: "Everything belongs to Horizon.",
-    copy: "No matter how different the world may seem, every project is part of the same connected franchise vision.",
+    copy: "No matter how different each world may seem, every project is part of the same franchise vision.",
     accent: "#F5B942",
     glow: "rgba(245,185,66,0.38)",
     icon: "infinity",
@@ -279,45 +283,71 @@ function SectionAtmosphere() {
 
 function ConceptScroller() {
   const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
-
+  const pinRef = useRef(null);
   const [currentStep, setCurrentStep] = useState(0);
 
   React.useEffect(() => {
-    const unsubscribe = scrollYProgress.on("change", (latest) => {
-      if (latest < 0.3333) {
-        setCurrentStep(0);
-      } else if (latest < 0.6666) {
-        setCurrentStep(1);
-      } else {
-        setCurrentStep(2);
-      }
-    });
+    const section = sectionRef.current;
+    const pin = pinRef.current;
 
-    return () => unsubscribe();
-  }, [scrollYProgress]);
+    if (!section || !pin) return undefined;
+
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: () => `+=${window.innerHeight * conceptSlides.length}`,
+        pin,
+        pinSpacing: true,
+        scrub: 0.65,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const nextStep = Math.min(
+            conceptSlides.length - 1,
+            Math.floor(self.progress * conceptSlides.length)
+          );
+
+          setCurrentStep((prev) => (prev === nextStep ? prev : nextStep));
+        },
+      });
+    }, section);
+
+    ScrollTrigger.refresh();
+
+    return () => ctx.revert();
+  }, []);
 
   const activeSlide = conceptSlides[currentStep];
   const progressHeights = useMemo(() => ["33%", "66%", "100%"], []);
 
+  const handleStepClick = (index) => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({
+      top: sectionTop + window.innerHeight * index,
+      behavior: "smooth",
+    });
+
+    setCurrentStep(index);
+  };
+
   return (
-    <section
-      id="concept"
-      ref={sectionRef}
-      className="relative bg-[#040404]"
-      style={{ height: `${conceptSlides.length * 100}vh` }}
-    >
-      <div className="sticky top-0 h-screen overflow-hidden bg-[#040404]">
+    <section id="concept" ref={sectionRef} className="relative bg-[#040404]">
+      <div ref={pinRef} className="relative flex h-screen items-center overflow-hidden bg-[#040404]">
         <SectionAtmosphere />
+
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(139,92,246,0.13),transparent_34%)]" />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[42rem] w-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/5" />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/5" />
 
         <div className="relative mx-auto flex h-full w-full max-w-7xl items-center px-6">
           <div className="grid w-full items-center gap-14 lg:grid-cols-[0.95fr_1.05fr]">
             <div className="max-w-3xl">
               <motion.p
-                key={`eyebrow-${currentStep}`}
+                key={`concept-eyebrow-${currentStep}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35 }}
@@ -340,21 +370,19 @@ function ConceptScroller() {
                       backgroundColor: activeSlide.accent,
                     }}
                     transition={{ duration: 0.45 }}
-                    style={{
-                      boxShadow: `0 0 18px ${activeSlide.glow}`,
-                    }}
+                    style={{ boxShadow: `0 0 18px ${activeSlide.glow}` }}
                   />
                 </div>
 
                 <div className="flex-1">
                   <AnimatePresence mode="wait">
                     <motion.div
-                      key={activeSlide.eyebrow}
-                      initial={{ opacity: 0, y: 24 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -24 }}
+                      key={`concept-card-${activeSlide.eyebrow}`}
+                      initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -24, scale: 0.98 }}
                       transition={{ duration: 0.42, ease: "easeOut" }}
-                      className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl md:p-9"
+                      className="rounded-[1.8rem] border border-white/10 bg-white/[0.045] p-7 backdrop-blur-xl md:p-9"
                       style={{ boxShadow: `0 0 42px ${activeSlide.glow}` }}
                     >
                       <p
@@ -379,20 +407,16 @@ function ConceptScroller() {
                       <button
                         key={slide.eyebrow}
                         type="button"
-                        onClick={() => setCurrentStep(index)}
+                        onClick={() => handleStepClick(index)}
                         className="group flex items-center gap-3 rounded-full border border-white/10 bg-black/25 px-4 py-2 backdrop-blur-md transition hover:border-white/20"
                       >
                         <span
                           className="h-2.5 w-2.5 rounded-full transition"
                           style={{
                             backgroundColor:
-                              currentStep === index
-                                ? slide.accent
-                                : "rgba(255,255,255,0.2)",
+                              currentStep === index ? slide.accent : "rgba(255,255,255,0.2)",
                             boxShadow:
-                              currentStep === index
-                                ? `0 0 12px ${slide.glow}`
-                                : "none",
+                              currentStep === index ? `0 0 12px ${slide.glow}` : "none",
                           }}
                         />
                         <span className="text-[10px] font-black uppercase tracking-[0.22em] text-white/55">
@@ -438,9 +462,9 @@ function ConceptScroller() {
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`visual-${activeSlide.eyebrow}`}
-                    initial={{ opacity: 0, scale: 0.92 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.92 }}
+                    initial={{ opacity: 0, scale: 0.92, y: 18 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.92, y: -18 }}
                     transition={{ duration: 0.42 }}
                     className="absolute inset-0 flex items-center justify-center p-12"
                   >
@@ -735,6 +759,7 @@ function HeroConstellation() {
                 ),
               }}
             />
+
             <motion.div
               className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-md"
               style={{
@@ -1041,6 +1066,8 @@ export default function Horizon() {
       touchMultiplier: 1.2,
     });
 
+    lenis.on("scroll", ScrollTrigger.update);
+
     let rafId;
 
     function raf(time) {
@@ -1050,7 +1077,11 @@ export default function Horizon() {
 
     rafId = requestAnimationFrame(raf);
 
+    const refresh = () => ScrollTrigger.refresh();
+    window.addEventListener("load", refresh);
+
     return () => {
+      window.removeEventListener("load", refresh);
       cancelAnimationFrame(rafId);
       lenis.destroy();
     };
@@ -1059,6 +1090,7 @@ export default function Horizon() {
   React.useEffect(() => {
     const fallback = window.setTimeout(() => {
       setShowIntro(false);
+      window.setTimeout(() => ScrollTrigger.refresh(), 250);
     }, INTRO_DURATION_FALLBACK);
 
     return () => window.clearTimeout(fallback);
@@ -1066,6 +1098,7 @@ export default function Horizon() {
 
   const handleVideoEnded = () => {
     setShowIntro(false);
+    window.setTimeout(() => ScrollTrigger.refresh(), 250);
   };
 
   return (
