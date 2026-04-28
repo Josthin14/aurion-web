@@ -1,12 +1,44 @@
-import React, { useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import Lenis from "lenis";
 import Tilt from "react-parallax-tilt";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 
 const INTRO_DURATION_FALLBACK = 10000;
 const horizonLogoSrc = "/images/horizon-infinity-logo.png";
 const horizonHeroBg = "/images/horizon-hero-bg.png";
 const horizonHeroVideo = "/videos/horizon-hero.mp4";
+
+const conceptSlides = [
+  {
+    eyebrow: "Different Worlds",
+    title: "Every story takes place in its own universe.",
+    copy: "Each Horizon is built as a distinct world with its own rules, tone, characters and mythology.",
+    accent: "#8B5CF6",
+    glow: "rgba(139,92,246,0.38)",
+    icon: "world",
+  },
+  {
+    eyebrow: "Independent Stories",
+    title: "You can enter any project without prior context.",
+    copy: "Every entry point is designed to stand on its own, allowing audiences to discover Horizon from different doors.",
+    accent: "#60A5FA",
+    glow: "rgba(96,165,250,0.38)",
+    icon: "portal",
+  },
+  {
+    eyebrow: "One Identity",
+    title: "Everything belongs to Horizon.",
+    copy: "No matter how different the world may seem, every project is part of the same connected franchise vision.",
+    accent: "#F5B942",
+    glow: "rgba(245,185,66,0.38)",
+    icon: "infinity",
+  },
+];
 
 const horizonLogos = [
   {
@@ -122,6 +154,44 @@ function ArrowIcon({ className = "" }) {
   );
 }
 
+function OrbitalIcon({ type, accent = "#8B5CF6" }) {
+  if (type === "world") {
+    return (
+      <svg viewBox="0 0 120 120" className="h-28 w-28" fill="none">
+        <circle cx="60" cy="60" r="34" stroke={accent} strokeWidth="2.5" opacity="0.95" />
+        <ellipse cx="60" cy="60" rx="52" ry="16" stroke="white" strokeWidth="1.5" opacity="0.3" />
+        <ellipse cx="60" cy="60" rx="18" ry="52" stroke="white" strokeWidth="1.5" opacity="0.18" />
+        <circle cx="89" cy="43" r="4" fill={accent} />
+      </svg>
+    );
+  }
+
+  if (type === "portal") {
+    return (
+      <svg viewBox="0 0 120 120" className="h-28 w-28" fill="none">
+        <circle cx="60" cy="60" r="36" stroke={accent} strokeWidth="2.5" />
+        <circle cx="60" cy="60" r="24" stroke="white" strokeWidth="1.6" opacity="0.35" />
+        <path d="M39 60h42" stroke="white" strokeWidth="1.6" opacity="0.35" />
+        <path d="M60 39v42" stroke="white" strokeWidth="1.6" opacity="0.2" />
+        <circle cx="60" cy="60" r="5" fill={accent} />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 120 120" className="h-28 w-28" fill="none">
+      <path
+        d="M24 60C34 42 46 42 60 60C74 78 86 78 96 60C86 42 74 42 60 60C46 78 34 78 24 60Z"
+        stroke={accent}
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="60" cy="60" r="6" fill="white" opacity="0.9" />
+    </svg>
+  );
+}
+
 function PremiumButton({ href, children, variant = "primary" }) {
   const primary = variant === "primary";
 
@@ -135,7 +205,7 @@ function PremiumButton({ href, children, variant = "primary" }) {
       }`}
     >
       <span className="relative z-10 inline-flex items-center gap-3">{children}</span>
-      <span className="pointer-events-none absolute inset-0 -translate-x-[130%] bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.0)_30%,rgba(255,255,255,0.35)_50%,rgba(255,255,255,0.0)_70%,transparent_100%)] transition duration-700 group-hover:translate-x-[130%]" />
+      <span className="pointer-events-none absolute inset-0 -translate-x-[130%] bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0)_30%,rgba(255,255,255,0.35)_50%,rgba(255,255,255,0)_70%,transparent_100%)] transition duration-700 group-hover:translate-x-[130%]" />
     </a>
   );
 }
@@ -204,6 +274,220 @@ function SectionAtmosphere() {
         className="absolute right-[-12%] top-[18%] h-[34rem] w-[34rem] rounded-full bg-[#0E2A7B]/18 blur-3xl"
       />
     </div>
+  );
+}
+
+function ConceptScroller() {
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  const [currentStep, setCurrentStep] = useState(0);
+
+  React.useEffect(() => {
+    const unsubscribe = scrollYProgress.on("change", (latest) => {
+      if (latest < 0.3333) {
+        setCurrentStep(0);
+      } else if (latest < 0.6666) {
+        setCurrentStep(1);
+      } else {
+        setCurrentStep(2);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [scrollYProgress]);
+
+  const activeSlide = conceptSlides[currentStep];
+  const progressHeights = useMemo(() => ["33%", "66%", "100%"], []);
+
+  return (
+    <section
+      id="concept"
+      ref={sectionRef}
+      className="relative bg-[#040404]"
+      style={{ height: `${conceptSlides.length * 100}vh` }}
+    >
+      <div className="sticky top-0 h-screen overflow-hidden bg-[#040404]">
+        <SectionAtmosphere />
+
+        <div className="relative mx-auto flex h-full w-full max-w-7xl items-center px-6">
+          <div className="grid w-full items-center gap-14 lg:grid-cols-[0.95fr_1.05fr]">
+            <div className="max-w-3xl">
+              <motion.p
+                key={`eyebrow-${currentStep}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35 }}
+                className="text-xs font-black uppercase tracking-[0.42em] text-[#9B6DFF]"
+              >
+                Concept
+              </motion.p>
+
+              <h2 className="mt-5 text-5xl font-black leading-[0.92] tracking-[-0.07em] md:text-7xl">
+                A franchise built through distinct worlds and one shared identity.
+              </h2>
+
+              <div className="mt-12 flex gap-6">
+                <div className="relative hidden w-1 md:block">
+                  <div className="absolute inset-0 rounded-full bg-white/10" />
+                  <motion.div
+                    className="absolute left-0 top-0 w-full rounded-full"
+                    animate={{
+                      height: progressHeights[currentStep],
+                      backgroundColor: activeSlide.accent,
+                    }}
+                    transition={{ duration: 0.45 }}
+                    style={{
+                      boxShadow: `0 0 18px ${activeSlide.glow}`,
+                    }}
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeSlide.eyebrow}
+                      initial={{ opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -24 }}
+                      transition={{ duration: 0.42, ease: "easeOut" }}
+                      className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl md:p-9"
+                      style={{ boxShadow: `0 0 42px ${activeSlide.glow}` }}
+                    >
+                      <p
+                        className="text-[10px] font-black uppercase tracking-[0.3em]"
+                        style={{ color: activeSlide.accent }}
+                      >
+                        {activeSlide.eyebrow}
+                      </p>
+
+                      <h3 className="mt-4 text-4xl font-black leading-[0.95] tracking-[-0.05em] md:text-5xl">
+                        {activeSlide.title}
+                      </h3>
+
+                      <p className="mt-6 max-w-2xl text-base leading-8 text-white/62 md:text-lg">
+                        {activeSlide.copy}
+                      </p>
+                    </motion.div>
+                  </AnimatePresence>
+
+                  <div className="mt-8 flex items-center gap-3">
+                    {conceptSlides.map((slide, index) => (
+                      <button
+                        key={slide.eyebrow}
+                        type="button"
+                        onClick={() => setCurrentStep(index)}
+                        className="group flex items-center gap-3 rounded-full border border-white/10 bg-black/25 px-4 py-2 backdrop-blur-md transition hover:border-white/20"
+                      >
+                        <span
+                          className="h-2.5 w-2.5 rounded-full transition"
+                          style={{
+                            backgroundColor:
+                              currentStep === index
+                                ? slide.accent
+                                : "rgba(255,255,255,0.2)",
+                            boxShadow:
+                              currentStep === index
+                                ? `0 0 12px ${slide.glow}`
+                                : "none",
+                          }}
+                        />
+                        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-white/55">
+                          {index + 1}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative hidden h-[42rem] lg:block">
+              <div className="absolute inset-0 overflow-hidden rounded-[2.2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(7,10,18,0.72),rgba(4,6,14,0.92))] backdrop-blur-2xl">
+                <div className="pointer-events-none absolute left-[10%] top-[8%] h-[14rem] w-[14rem] rounded-full bg-[#8B5CF6]/16 blur-3xl" />
+                <div className="pointer-events-none absolute right-[8%] top-[18%] h-[12rem] w-[12rem] rounded-full bg-[#60A5FA]/12 blur-3xl" />
+                <div className="pointer-events-none absolute bottom-[10%] left-[20%] h-[13rem] w-[13rem] rounded-full bg-[#F5B942]/12 blur-3xl" />
+
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                  className="absolute left-1/2 top-1/2 h-[24rem] w-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/8"
+                />
+
+                <motion.div
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+                  className="absolute left-1/2 top-1/2 h-[17rem] w-[17rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10"
+                />
+
+                <motion.div
+                  animate={{
+                    scale: [1, 1.08, 1],
+                    opacity: [0.5, 0.9, 0.5],
+                  }}
+                  transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute left-1/2 top-1/2 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full blur-lg"
+                  style={{
+                    background: `radial-gradient(circle,rgba(255,255,255,0.96)_0%,${activeSlide.accent}55_24%,rgba(96,165,250,0.18)_48%,transparent_72%)`,
+                  }}
+                />
+
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`visual-${activeSlide.eyebrow}`}
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.92 }}
+                    transition={{ duration: 0.42 }}
+                    className="absolute inset-0 flex items-center justify-center p-12"
+                  >
+                    <div
+                      className="w-full max-w-[30rem] rounded-[1.8rem] border border-white/10 bg-black/28 p-8 backdrop-blur-xl"
+                      style={{ boxShadow: `0 0 55px ${activeSlide.glow}` }}
+                    >
+                      <div className="flex items-center gap-5">
+                        <div
+                          className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10"
+                          style={{
+                            background: `radial-gradient(circle, ${activeSlide.accent}33 0%, rgba(255,255,255,0.03) 72%)`,
+                          }}
+                        >
+                          <OrbitalIcon type={activeSlide.icon} accent={activeSlide.accent} />
+                        </div>
+
+                        <div>
+                          <p
+                            className="text-[10px] font-black uppercase tracking-[0.28em]"
+                            style={{ color: activeSlide.accent }}
+                          >
+                            {activeSlide.eyebrow}
+                          </p>
+
+                          <h3 className="mt-2 text-3xl font-black leading-[0.95] tracking-[-0.05em]">
+                            {activeSlide.title}
+                          </h3>
+                        </div>
+                      </div>
+
+                      <p className="mt-6 text-base leading-8 text-white/62">
+                        {activeSlide.copy}
+                      </p>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full border border-white/10 bg-black/35 px-5 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-white/65 backdrop-blur-md">
+                  Scroll to reveal the concept
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -445,7 +729,10 @@ function HeroConstellation() {
                 delay: particle.delay,
                 repeat: Infinity,
                 ease: "linear",
-                times: Array.from({ length: particleKeyframes.length }, (_, i) => i / (particleKeyframes.length - 1)),
+                times: Array.from(
+                  { length: particleKeyframes.length },
+                  (_, i) => i / (particleKeyframes.length - 1)
+                ),
               }}
             />
             <motion.div
@@ -467,7 +754,10 @@ function HeroConstellation() {
                 delay: particle.delay,
                 repeat: Infinity,
                 ease: "linear",
-                times: Array.from({ length: particleKeyframes.length }, (_, i) => i / (particleKeyframes.length - 1)),
+                times: Array.from(
+                  { length: particleKeyframes.length },
+                  (_, i) => i / (particleKeyframes.length - 1)
+                ),
               }}
             />
           </React.Fragment>
@@ -621,55 +911,95 @@ function HorizonPoster({ item, index }) {
       transitionSpeed={1400}
       scale={1.01}
       glareEnable={false}
-      className="rounded-[1.7rem]"
+      className="rounded-[1.9rem]"
     >
       <motion.article
         initial={{ opacity: 0, y: 34 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ delay: index * 0.08, duration: 0.7 }}
-        className="group relative overflow-hidden rounded-[1.7rem] border border-white/12 bg-black shadow-2xl transition duration-500 hover:-translate-y-2 hover:border-white/35"
+        className="group relative overflow-hidden rounded-[1.9rem] border border-white/12 bg-black shadow-2xl transition duration-500 hover:-translate-y-2 hover:border-white/35"
         onMouseEnter={(event) => {
-          event.currentTarget.style.boxShadow = `0 0 80px ${item.glow}`;
+          event.currentTarget.style.boxShadow = `0 0 90px ${item.glow}`;
         }}
         onMouseLeave={(event) => {
           event.currentTarget.style.boxShadow = "0 24px 55px rgba(0,0,0,0.45)";
         }}
       >
-        <div className="relative aspect-[2/3] bg-black">
+        <div className="relative aspect-[0.78] bg-black">
           <img
             src={item.image}
             alt={item.name}
             className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105 group-hover:brightness-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/32 to-transparent" />
-          <div className="absolute inset-x-0 top-0 flex items-center gap-3 p-6">
-            <span className="h-9 w-1 rounded-full" style={{ backgroundColor: item.accent }} />
-            <p className="text-[10px] font-black uppercase tracking-[0.38em] text-white/72">
-              {item.code}
-            </p>
-          </div>
-          <div className="absolute inset-x-0 bottom-0 p-6">
-            <h3 className="text-3xl font-black leading-none tracking-[-0.06em]">
-              {item.name}
-            </h3>
-            <p className="mt-4 text-sm leading-6 text-white/65">{item.copy}</p>
 
-            <div className="mt-6">
-              <a
-                href="#final"
-                className="group/btn relative inline-flex items-center gap-3 overflow-hidden rounded-full px-5 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-white transition"
-                style={{
-                  backgroundColor: `${item.accent}55`,
-                  border: `1px solid ${item.accent}`,
-                }}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.06)_30%,rgba(0,0,0,0.16)_55%,rgba(0,0,0,0.52)_100%)]" />
+
+          <div
+            className="absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-100"
+            style={{
+              background: `radial-gradient(circle at 50% 35%, ${item.glow}, transparent 58%)`,
+            }}
+          />
+
+          <div className="absolute inset-x-0 top-0 flex items-start justify-between p-5">
+            <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-black/35 px-4 py-2 backdrop-blur-md">
+              <span
+                className="h-5 w-[3px] rounded-full"
+                style={{ backgroundColor: item.accent }}
+              />
+              <span className="text-[10px] font-black uppercase tracking-[0.28em] text-white/78">
+                {item.code}
+              </span>
+            </div>
+
+            <div
+              className="h-11 w-11 rounded-full border border-white/10 backdrop-blur-md"
+              style={{
+                background: `radial-gradient(circle, ${item.accent}44 0%, rgba(0,0,0,0.35) 72%)`,
+                boxShadow: `0 0 24px ${item.glow}`,
+              }}
+            />
+          </div>
+
+          <div className="absolute inset-x-0 bottom-0 p-4">
+            <div className="rounded-[1.35rem] border border-white/10 bg-[linear-gradient(180deg,rgba(8,10,18,0.22),rgba(5,7,14,0.62))] p-4 backdrop-blur-md">
+              <p
+                className="text-[9px] font-black uppercase tracking-[0.26em]"
+                style={{ color: item.accent }}
               >
-                <span className="relative z-10 inline-flex items-center gap-3">
-                  Enter Horizon
-                  <ArrowIcon className="h-4 w-4 transition group-hover/btn:translate-x-1" />
+                Connected World
+              </p>
+
+              <h3 className="mt-2 text-[1.85rem] font-black leading-[0.92] tracking-[-0.05em]">
+                {item.name}
+              </h3>
+
+              <p className="mt-2 text-[13px] leading-6 text-white/65">
+                {item.copy}
+              </p>
+
+              <div className="mt-4 flex items-center justify-between">
+                <span className="text-[9px] font-black uppercase tracking-[0.22em] text-white/35">
+                  Myth Entry
                 </span>
-                <span className="pointer-events-none absolute inset-0 -translate-x-[130%] bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.0)_30%,rgba(255,255,255,0.35)_50%,rgba(255,255,255,0.0)_70%,transparent_100%)] transition duration-700 group-hover/btn:translate-x-[130%]" />
-              </a>
+
+                <a
+                  href="#final"
+                  className="group/btn relative inline-flex items-center gap-3 overflow-hidden rounded-full px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-white transition"
+                  style={{
+                    backgroundColor: `${item.accent}55`,
+                    border: `1px solid ${item.accent}`,
+                    boxShadow: `0 0 20px ${item.glow}`,
+                  }}
+                >
+                  <span className="relative z-10 inline-flex items-center gap-3">
+                    Enter Horizon
+                    <ArrowIcon className="h-4 w-4 transition group-hover/btn:translate-x-1" />
+                  </span>
+                  <span className="pointer-events-none absolute inset-0 -translate-x-[130%] bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0)_30%,rgba(255,255,255,0.35)_50%,rgba(255,255,255,0)_70%,transparent_100%)] transition duration-700 group-hover/btn:translate-x-[130%]" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -739,7 +1069,7 @@ export default function Horizon() {
   };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#050505] text-white selection:bg-[#7A3FFF] selection:text-white">
+    <main className="min-h-screen overflow-x-hidden bg-[#050505] text-white selection:bg-[#7A3FFF] selection:text-white">
       <AnimatePresence mode="wait">
         {showIntro ? (
           <motion.section
@@ -806,7 +1136,7 @@ export default function Horizon() {
                     transition={{ duration: 0.8 }}
                     className="mb-8 border-l-2 border-[#7A3FFF] pl-4 text-xs font-black uppercase tracking-[0.42em] text-[#9B6DFF]"
                   >
-                    Horizon Universe
+                    HORIZON
                   </motion.p>
 
                   <motion.img
@@ -824,7 +1154,7 @@ export default function Horizon() {
                     transition={{ duration: 0.9, delay: 0.22 }}
                     className="mt-12 max-w-5xl text-6xl font-black leading-[0.9] tracking-[-0.075em] md:text-8xl"
                   >
-                    One symbol. Infinite worlds. One final destiny.
+                    A multiverse of stories. One franchise.
                   </motion.h1>
 
                   <motion.p
@@ -833,7 +1163,8 @@ export default function Horizon() {
                     transition={{ duration: 0.9, delay: 0.34 }}
                     className="mt-8 max-w-2xl text-lg leading-9 text-white/60 md:text-xl"
                   >
-                    Horizon is AURION’s mythological multiverse: anime, music, games and cinematic worlds bound together by the infinite symbol, fractured destinies and one final convergence.
+                    Explore distinct worlds, each with its own story, all connected
+                    under a shared creative vision.
                   </motion.p>
 
                   <motion.div
@@ -843,12 +1174,12 @@ export default function Horizon() {
                     className="mt-12 flex flex-wrap gap-4"
                   >
                     <PremiumButton href="#worlds" variant="primary">
-                      Explore Worlds
+                      Explore Universes
                       <ArrowIcon className="h-4 w-4 transition group-hover:translate-x-1" />
                     </PremiumButton>
 
-                    <PremiumButton href="#system" variant="secondary">
-                      Read System
+                    <PremiumButton href="#timeline" variant="secondary">
+                      View Projects
                     </PremiumButton>
                   </motion.div>
                 </div>
@@ -872,7 +1203,7 @@ export default function Horizon() {
                     </p>
 
                     <h2 className="mt-5 text-5xl font-black leading-[0.9] tracking-[-0.07em] md:text-7xl">
-                      AURION’s mythological entertainment universe.
+                      Horizon is the entertainment franchise of AURION Global Holdings, Inc.
                     </h2>
                   </motion.div>
 
@@ -884,22 +1215,18 @@ export default function Horizon() {
                     className="rounded-[2rem] border border-white/10 bg-white/[0.06] p-8 backdrop-blur-2xl md:p-10"
                   >
                     <p className="text-xl leading-9 text-white/65">
-                      Horizon is a connected narrative IP where anime, music,
-                      videogames and cinematic worlds exist under one evolving
-                      mythology. Each Horizon may appear independent at first,
-                      but all of them are bound by the infinity symbol, hidden
-                      anomalies and a final convergence still waiting to unfold.
+                      A narrative ecosystem where every story exists in a different
+                      world, developed across film, series, videogames and music.
                     </p>
 
-                    <div className="mt-8 grid gap-4 md:grid-cols-3">
+                    <div className="mt-8 grid gap-4 md:grid-cols-2">
                       {[
-                        "Connected IP",
-                        "Multiple Media Forms",
-                        "One Expanding Mythology",
+                        "Each project stands on its own.",
+                        "Together, they form Horizon.",
                       ].map((item) => (
                         <div
                           key={item}
-                          className="rounded-2xl border border-white/10 bg-black/30 p-6 text-center font-black uppercase tracking-[0.18em] text-white/72"
+                          className="rounded-2xl border border-white/10 bg-black/30 p-6 text-center font-black tracking-[0.02em] text-white/72"
                         >
                           {item}
                         </div>
@@ -910,21 +1237,29 @@ export default function Horizon() {
               </div>
             </section>
 
+            <ConceptScroller />
+
             <section id="worlds" className="relative bg-[#050505] py-32 md:py-44">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(122,63,255,0.08),transparent_35%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(122,63,255,0.10),transparent_32%)]" />
+              <div className="pointer-events-none absolute left-[-8%] top-[18%] h-[26rem] w-[26rem] rounded-full bg-[#6D3BFF]/10 blur-3xl" />
+              <div className="pointer-events-none absolute right-[-8%] bottom-[10%] h-[24rem] w-[24rem] rounded-full bg-[#2563EB]/10 blur-3xl" />
+
               <div className="relative mx-auto max-w-7xl px-6">
-                <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                <div className="mb-16 grid gap-8 lg:grid-cols-[1fr_0.7fr] lg:items-end">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.42em] text-[#9B6DFF]">
                       Current Worlds
                     </p>
-                    <h2 className="mt-5 text-5xl font-black leading-none tracking-[-0.07em] md:text-7xl">
-                      Enter the Horizons.
+                    <h2 className="mt-5 max-w-5xl text-5xl font-black leading-[0.92] tracking-[-0.07em] md:text-7xl">
+                      Four worlds. One expanding mythology.
                     </h2>
                   </div>
-                  <p className="max-w-md leading-8 text-white/55">
-                    Every world expands the same hidden system. Some are fantasy.
-                    Some are music. Some are games. All are connected.
+
+                  <p className="max-w-xl leading-8 text-white/55">
+                    Every Horizon is designed as its own creative pillar —
+                    fantasy, music, ancient collapse and living memory — but
+                    none of them exist alone. Together, they shape the same
+                    evolving myth.
                   </p>
                 </div>
 
